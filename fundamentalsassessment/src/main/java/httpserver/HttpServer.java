@@ -15,7 +15,7 @@ public class HttpServer {
   private ServerSocket serverSocket;
   private Socket socket;
   private ExecutorService threadPool;
-  private ArrayList<Path> pathArray = new ArrayList<Path>();
+  private ArrayList<String> pathStrings = new ArrayList<String>();
 
   // constructor, server is initiliased with constructor
   public HttpServer(int serverPort, String paths) {
@@ -24,7 +24,7 @@ public class HttpServer {
       this.serverSocket = new ServerSocket(this.serverPort);
       System.out.println("Server listening on: " + this.serverPort);
 
-      this.pathArray = verifyDirectories(paths);
+      this.pathStrings = verifyDirectories(paths);
     } catch (IOException e) {
       System.err.println("Unable to connect and listen from " + serverPort);
       System.exit(1);
@@ -33,14 +33,14 @@ public class HttpServer {
   }
 
   // verifies directories and add them to array of Path
-  public ArrayList<Path> verifyDirectories(String paths) {
-    ArrayList<Path> tempArray = new ArrayList<Path>();
+  public ArrayList<String> verifyDirectories(String paths) {
+    ArrayList<String> tempArray = new ArrayList<String>();
     String[] directories = paths.split(":");
     for (String dir : directories) {
       Path dirPath = Path.of(dir);
       // verify that path exists and is a directory
       if (Files.isReadable(dirPath) && Files.isDirectory(dirPath)) {
-        tempArray.add(dirPath);
+        tempArray.add(dir);
       } else {
         System.err.println("Invalid directory stated in docRoot.");
         System.exit(1);
@@ -66,7 +66,7 @@ public class HttpServer {
       while (true) {
         this.socket = this.serverSocket.accept();
         System.out.println("Relevant information on this socket: " + this.socket);
-        threadPool.submit(new HttpClientConnection(this.socket));
+        threadPool.submit(new HttpClientConnection(this.socket, this.pathArray));
       }
 
     } catch (Exception e) {
