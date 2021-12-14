@@ -10,70 +10,70 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HttpServer {
-  /*
-   * private int serverPort;
-   * private ServerSocket serverSocket;
-   * private Socket socket;
-   * private ExecutorService threadPool;
-   * 
-   * private ArrayList<Path> pathArray = new ArrayList<Path>();
-   * 
-   * // constructor
-   * public HttpServer(int serverPort, String paths) {
-   * this.serverPort = serverPort;
-   * this.pathArray = verifyDirectories(paths);
-   * }
-   * 
-   * public ArrayList<Path> verifyDirectories(String paths) {
-   * ArrayList<Path> tempArray = new ArrayList<Path>();
-   * String[] directories = paths.split(":");
-   * for (String dir : directories) {
-   * Path dirPath = Path.of(dir);
-   * // verify that path exists and is a directory
-   * if (dirPath.toFile().exists() && dirPath.toFile().isDirectory()) {
-   * tempArray.add(dirPath);
-   * } else {
-   * System.out.println("Directory specified does not exist.");
-   * System.exit(1);
-   * }
-   * }
-   * return tempArray;
-   * }
-   * 
-   * // start server
-   * public void startServer() throws IOException {
-   * this.serverSocket = new ServerSocket(this.serverPort);
-   * // a threadpool with 3 threads is created
-   * this.threadPool = Executors.newFixedThreadPool(3);
-   * System.out.println("Server started on port: " + this.serverPort);
-   * }
-   * 
-   * // establish connection
-   * public void connectServer() throws IOException {
-   * // while loop is used as you want the serverSocket to constantly accept new
-   * // sockets that are incoming
-   * 
-   * try {
-   * int count = 1;
-   * while (true) {
-   * System.out.println("Connecting fella " + count);
-   * // Scans and accepts new socket connections.
-   * // redefining new sockets in the same pointer is fine because the
-   * // CookieClientHandler will be managing the sockets. You do not need the
-   * pointer
-   * // to assess the previous sockets introduced.
-   * this.socket = this.serverSocket.accept();
-   * System.out.println("Fella " + count + " connected");
-   * System.out.println("Relevant information on this socket: " + this.socket);
-   * 
-   * threadPool.execute( HttpClientHandler );
-   * count++;
-   * }
-   * 
-   * } catch (Exception e) {
-   * 
-   * }
-   * 
-   * }
-   */
+
+  private int serverPort;
+  private ServerSocket serverSocket;
+  private Socket socket;
+  private ExecutorService threadPool;
+  private ArrayList<Path> pathArray = new ArrayList<Path>();
+
+  // constructor, server is initiliased with constructor
+  public HttpServer(int serverPort, String paths) {
+    try {
+      this.serverPort = serverPort;
+      this.serverSocket = new ServerSocket(this.serverPort);
+      System.out.println("Server listening on: " + this.serverPort);
+
+      this.pathArray = verifyDirectories(paths);
+    } catch (IOException e) {
+      System.err.println("Unable to connect and listen from " + serverPort);
+      System.exit(1);
+    }
+
+  }
+
+  // verifies directories and add them to array of Path
+  public ArrayList<Path> verifyDirectories(String paths) {
+    ArrayList<Path> tempArray = new ArrayList<Path>();
+    String[] directories = paths.split(":");
+    for (String dir : directories) {
+      Path dirPath = Path.of(dir);
+      // verify that path exists and is a directory
+      if (Files.isReadable(dirPath) && Files.isDirectory(dirPath)) {
+        tempArray.add(dirPath);
+      } else {
+        System.err.println("Invalid directory stated in docRoot.");
+        System.exit(1);
+      }
+    }
+    return tempArray;
+  }
+
+  // create ThreadPool
+  public void createThreadPool() throws IOException {
+    // a threadpool with 3 threads is created
+    this.threadPool = Executors.newFixedThreadPool(3);
+
+  }
+
+  // establish connection
+  public void acceptConnections() throws IOException {
+    // while loop is used as you want the serverSocket to constantly accept new
+    // sockets that are incoming
+
+    try {
+
+      while (true) {
+        this.socket = this.serverSocket.accept();
+        System.out.println("Relevant information on this socket: " + this.socket);
+        threadPool.submit(new HttpClientConnection(this.socket));
+      }
+
+    } catch (Exception e) {
+      System.err.println("Problems with Socker.");
+      System.exit(1);
+    }
+
+  }
+
 }
