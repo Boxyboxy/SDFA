@@ -18,6 +18,8 @@ public class Main {
 
         System.out.println(serverPort);
         System.out.println(paths);
-        // HttpServer server = new HttpServer(serverPort, paths);
+        HttpServer server = new HttpServer(serverPort, paths);
+        server.createThreadPool();
+        server.acceptConnections();
     }
 }

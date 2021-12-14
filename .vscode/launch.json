@@ -16,7 +16,7 @@
       "request": "launch",
       "mainClass": "httpserver.Main",
       "projectName": "fundamentalsassessment",
-      "args": "--port 8080 --docRoot ./target:/opt/tmp/www"
+      "args": "--port 8080 --docRoot ./static"
     }
   ]
 }
