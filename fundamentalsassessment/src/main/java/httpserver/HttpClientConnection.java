@@ -81,6 +81,7 @@ public class HttpClientConnection implements Runnable {
     // reads only one line from browser and storing arguments as method and
     // resourceName
     String fromBrowser = this.reader.readLine(); // IOException
+    System.out.println(fromBrowser);
     String[] arguments = fromBrowser.split(" ");
     return arguments;
   }
